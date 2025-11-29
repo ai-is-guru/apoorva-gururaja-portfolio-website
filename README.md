@@ -4,6 +4,7 @@
 
 # Apoorva Gururaja Portfolio Website
 
+
 A modern portfolio website built with React, TypeScript, and Vite featuring AI-powered chat functionality.
 
 ## Prerequisites
