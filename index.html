@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Apoorva Gururaja | Product & AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.birds.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <script>
+      // Minimal config to support Dark Mode toggle
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              serif: ['Playfair Display', 'serif'],
+            },
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #020617;
+        overflow: hidden;
+        transition: background-color 1s ease;
+      }
+      
+      .font-serif {
+        font-family: 'Playfair Display', serif;
+      }
+
+      body.custom-cursor-active, body.custom-cursor-active * {
+        cursor: none !important;
+      }
+
+      .mesh-gradient {
+        background-image: 
+          radial-gradient(at 0% 0%, rgba(255,255,255,0.05) 0, transparent 50%), 
+          radial-gradient(at 50% 0%, rgba(255,255,255,0.05) 0, transparent 50%), 
+          radial-gradient(at 100% 0%, rgba(255,255,255,0.05) 0, transparent 50%);
+      }
+
+      /* Glassmorphism */
+      .glass {
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      
+      .dark .glass {
+        background: rgba(30, 41, 59, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        box-shadow: 0 8px 32px 0 rgba(82, 121, 111, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        transition: background-color 0.3s, border-color 0.3s;
+      }
+
+      .dark .glass-panel {
+        background: rgba(30, 41, 59, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+      }
+
+      /* Scrollbar */
+      .hide-scrollbar::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
+      }
+      
+      .thin-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .thin-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .thin-scrollbar::-webkit-scrollbar-thumb {
+        background-color: rgba(148, 163, 184, 0.3);
+        border-radius: 20px;
+      }
+      
+      .dark .thin-scrollbar::-webkit-scrollbar-thumb {
+          background-color: rgba(255, 255, 255, 0.2);
+      }
+
+      ::selection {
+        background: #00f2ff;
+        color: #000;
+      }
+
+      .perspective-container {
+        perspective: 1200px;
+      }
+
+      /* Custom Animations */
+      @keyframes blob {
+        0% { transform: translate(0px, 0px) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0px, 0px) scale(1); }
+      }
+      .animate-blob { animation: blob 10s infinite; }
+
+      @keyframes popIn {
+        0% { opacity: 0; transform: scale(0.95); }
+        100% { opacity: 1; transform: scale(1); }
+      }
+      .animate-pop-in { animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+
+      @keyframes fadeInUp {
+        0% { opacity: 0; transform: translateY(10px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+      }
+      .animate-float { animation: float 6s ease-in-out infinite; }
+
+      @keyframes spin-slow {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }                   
+      .animate-spin-slow { animation: spin-slow 8s linear infinite; }
+
+      @keyframes crtTurnOn {
+        0% { transform: scale(1, 0.002); opacity: 0; filter: brightness(3); }
+        50% { transform: scale(1, 0.002); opacity: 1; filter: brightness(3); }
+        100% { transform: scale(1, 1); opacity: 1; filter: brightness(1); }
+      }
+      .animate-crt-on { animation: crtTurnOn 0.4s ease-out forwards; }
+    </style>
+    <link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
