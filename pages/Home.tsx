@@ -256,7 +256,7 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
   }, []);
 
   return (
-    <div className="h-full w-full overflow-y-auto thin-scrollbar pb-32 sm:pb-40 md:pb-32 pt-20 sm:pt-24 md:pt-28 px-3 sm:px-4 md:px-6 safe-area-inset">
+    <div className="h-full w-full overflow-y-auto thin-scrollbar pb-48 sm:pb-52 md:pb-56 lg:pb-60 pt-20 sm:pt-24 md:pt-28 px-3 sm:px-4 md:px-6 safe-area-inset" style={{ paddingBottom: 'max(240px, env(safe-area-inset-bottom, 0px) + 240px)' }}>
       {/* 
          Grid Layout Strategy (4 Columns):
          Row 1: Profile (2x2), Theme (1x1), Map (1x1)
