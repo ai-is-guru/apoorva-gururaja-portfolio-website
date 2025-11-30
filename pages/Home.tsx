@@ -378,6 +378,9 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
                         {new Date().getDate()}
                     </div>
                     <div className="text-xs sm:text-sm text-slate-600 dark:text-neutral-400 font-medium text-center">
+                        {new Date().toLocaleDateString('en-US', { month: 'short' })} {new Date().getFullYear()}
+                    </div>
+                    <div className="text-[10px] sm:text-xs text-slate-500 dark:text-neutral-500 font-medium text-center mt-0.5">
                         {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
                     </div>
                 </div>
