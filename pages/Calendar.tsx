@@ -77,7 +77,7 @@ const Calendar: React.FC = () => {
       <div className="bg-white dark:bg-slate-950 min-h-full p-6 sm:p-8 md:p-12">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-center relative mb-8">
             <div className="flex items-center gap-4">
               <button
                 onClick={goToPreviousMonth}
@@ -86,7 +86,7 @@ const Calendar: React.FC = () => {
               >
                 <ChevronLeft size={20} className="text-slate-600 dark:text-slate-400" />
               </button>
-              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 dark:text-white">
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 dark:text-white min-w-[200px] text-center">
                 {monthNames[month]} {year}
               </h2>
               <button
@@ -99,7 +99,7 @@ const Calendar: React.FC = () => {
             </div>
             <button
               onClick={goToToday}
-              className="px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+              className="absolute right-0 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
             >
               Today
             </button>

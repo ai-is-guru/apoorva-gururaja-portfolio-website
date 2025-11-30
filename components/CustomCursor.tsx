@@ -7,24 +7,18 @@ const CustomCursor: React.FC = () => {
   const animationFrameRef = useRef<number | null>(null);
   const lastMousePosRef = useRef({ x: 0, y: 0 });
 
-  // Throttle mouse move using requestAnimationFrame
+  // Update cursor position immediately for better responsiveness
   const moveCursor = useCallback((e: MouseEvent) => {
-    lastMousePosRef.current = { x: e.clientX, y: e.clientY };
+    const x = e.clientX;
+    const y = e.clientY;
     
-    if (animationFrameRef.current === null) {
-      animationFrameRef.current = requestAnimationFrame(() => {
-        const { x, y } = lastMousePosRef.current;
-        
-        if (cursorRef.current) {
-          cursorRef.current.style.transform = `translate(${x}px, ${y}px)`;
-        }
-        
-        if (ringRef.current) {
-          ringRef.current.style.transform = `translate(${x}px, ${y}px) ${isHovering ? 'scale(1.5)' : 'scale(1)'}`;
-        }
-        
-        animationFrameRef.current = null;
-      });
+    // Update immediately without throttling for better responsiveness
+    if (cursorRef.current) {
+      cursorRef.current.style.transform = `translate(${x}px, ${y}px)`;
+    }
+    
+    if (ringRef.current) {
+      ringRef.current.style.transform = `translate(${x}px, ${y}px) ${isHovering ? 'scale(1.5)' : 'scale(1)'}`;
     }
   }, [isHovering]);
 
@@ -41,13 +35,18 @@ const CustomCursor: React.FC = () => {
     // Add class to body to hide default cursor
     document.body.classList.add('custom-cursor-active');
 
+    // Use direct event listeners for better performance
     window.addEventListener('mousemove', moveCursor, { passive: true });
     window.addEventListener('mouseover', handleMouseOver, { passive: true });
+    document.addEventListener('mousemove', moveCursor, { passive: true });
+    document.addEventListener('mouseover', handleMouseOver, { passive: true });
 
     return () => {
       document.body.classList.remove('custom-cursor-active');
       window.removeEventListener('mousemove', moveCursor);
       window.removeEventListener('mouseover', handleMouseOver);
+      document.removeEventListener('mousemove', moveCursor);
+      document.removeEventListener('mouseover', handleMouseOver);
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
       }

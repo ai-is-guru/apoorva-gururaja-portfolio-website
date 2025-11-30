@@ -1,228 +1,202 @@
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
 interface ParticleBackgroundProps {
   darkMode: boolean;
 }
 
-class Bird {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  ax: number;
-  ay: number;
-  size: number;
-  color: string;
-  speed: number;
-  canvasWidth: number;
-  canvasHeight: number;
-
-  constructor(w: number, h: number, color: string) {
-    this.canvasWidth = w;
-    this.canvasHeight = h;
-    this.x = Math.random() * w;
-    this.y = Math.random() * h;
-    this.vx = Math.random() * 4 - 2;
-    this.vy = Math.random() * 4 - 2;
-    this.ax = 0;
-    this.ay = 0;
-    this.size = Math.random() * 2 + 2;
-    this.color = color;
-    this.speed = Math.random() * 1 + 1;
-  }
-
-  update(birds: Bird[], mouseX: number, mouseY: number) {
-    this.flock(birds);
-    
-    // Mouse interaction (avoidance)
-    if (mouseX !== -1 && mouseY !== -1) {
-      const dx = this.x - mouseX;
-      const dy = this.y - mouseY;
-      const d = Math.sqrt(dx * dx + dy * dy);
-      if (d < 200) {
-        this.ax += dx / d * 0.5;
-        this.ay += dy / d * 0.5;
-      }
-    }
-
-    this.vx += this.ax;
-    this.vy += this.ay;
-
-    // Limit speed
-    const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
-    if (speed > this.speed) {
-      this.vx = (this.vx / speed) * this.speed;
-      this.vy = (this.vy / speed) * this.speed;
-    }
-
-    this.x += this.vx;
-    this.y += this.vy;
-
-    // Wrap around
-    if (this.x < 0) this.x = this.canvasWidth;
-    if (this.x > this.canvasWidth) this.x = 0;
-    if (this.y < 0) this.y = this.canvasHeight;
-    if (this.y > this.canvasHeight) this.y = 0;
-
-    this.ax = 0;
-    this.ay = 0;
-  }
-
-  flock(birds: Bird[]) {
-    let alignX = 0, alignY = 0;
-    let cohesionX = 0, cohesionY = 0;
-    let separationX = 0, separationY = 0;
-    let total = 0;
-    const perceptionRadius = 50;
-    const separationRadius = 25;
-
-    for (let other of birds) {
-      const dx = this.x - other.x;
-      const dy = this.y - other.y;
-      const d = Math.sqrt(dx * dx + dy * dy);
-
-      if (other !== this && d < perceptionRadius) {
-        alignX += other.vx;
-        alignY += other.vy;
-        cohesionX += other.x;
-        cohesionY += other.y;
-        total++;
-      }
-      
-      if (other !== this && d < separationRadius) {
-        separationX += dx / d;
-        separationY += dy / d;
-      }
-    }
-
-    if (total > 0) {
-      alignX /= total;
-      alignY /= total;
-      alignX = (alignX / Math.sqrt(alignX * alignX + alignY * alignY)) * this.speed;
-      alignY = (alignY / Math.sqrt(alignX * alignX + alignY * alignY)) * this.speed;
-      alignX -= this.vx;
-      alignY -= this.vy;
-
-      cohesionX /= total;
-      cohesionY /= total;
-      cohesionX -= this.x;
-      cohesionY -= this.y;
-      const cohesionDist = Math.sqrt(cohesionX * cohesionX + cohesionY * cohesionY);
-      if (cohesionDist > 0) {
-        cohesionX = (cohesionX / cohesionDist) * this.speed;
-        cohesionY = (cohesionY / cohesionDist) * this.speed;
-      }
-      cohesionX -= this.vx;
-      cohesionY -= this.vy;
-    }
-
-    // Force weights
-    this.ax += alignX * 0.05;
-    this.ay += alignY * 0.05;
-    this.ax += cohesionX * 0.01;
-    this.ay += cohesionY * 0.01;
-    this.ax += separationX * 0.1;
-    this.ay += separationY * 0.1;
-  }
-
-  draw(ctx: CanvasRenderingContext2D) {
-    const angle = Math.atan2(this.vy, this.vx);
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate(angle);
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    ctx.moveTo(this.size * 2, 0);
-    ctx.lineTo(-this.size, -this.size);
-    ctx.lineTo(-this.size, this.size);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-  }
-}
-
 const ParticleBackground: React.FC<ParticleBackgroundProps> = ({ darkMode }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const requestRef = useRef<number>();
-  const birdsRef = useRef<Bird[]>([]);
-  const mouseRef = useRef({ x: -1, y: -1 });
+  const vantaRef = useRef<HTMLDivElement>(null);
+  const vantaEffectRef = useRef<any>(null);
+  const widgetPositionsRef = useRef<Map<string, { x: number; y: number; width: number; height: number }>>(new Map());
+  const avoidanceActiveRef = useRef<boolean>(false);
+  const hoveredWidgetRef = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
+  // Detect mobile devices
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const checkMobile = () => {
+      const isMobileDevice = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(isMobileDevice);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      // Re-initialize birds if dimensions change significantly to keep them on screen
-      // Or just let them wrap naturally
-      birdsRef.current.forEach(bird => {
-        bird.canvasWidth = canvas.width;
-        bird.canvasHeight = canvas.height;
-      });
+  // Listen for widget position updates
+  useEffect(() => {
+    const handleWidgetPosition = (e: CustomEvent<{ id: string; x: number; y: number; width: number; height: number }>) => {
+      const { id, x, y, width, height } = e.detail;
+      widgetPositionsRef.current.set(id, { x, y, width, height });
     };
 
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    const handleWidgetHover = (e: CustomEvent<{ x: number; y: number; active: boolean; width?: number; height?: number }>) => {
+      avoidanceActiveRef.current = e.detail.active;
+      if (e.detail.active && e.detail.width && e.detail.height) {
+        hoveredWidgetRef.current = {
+          x: e.detail.x - e.detail.width / 2,
+          y: e.detail.y - e.detail.height / 2,
+          width: e.detail.width,
+          height: e.detail.height
+        };
+      } else {
+        hoveredWidgetRef.current = null;
+      }
+    };
 
-    // Initialize birds
-    const birdCount = 35; // Reduced count for performance
-    const color1 = darkMode ? '#404040' : '#808080';
+    window.addEventListener('widgetPosition' as any, handleWidgetPosition as EventListener);
+    window.addEventListener('widgetHover' as any, handleWidgetHover as EventListener);
     
-    if (birdsRef.current.length === 0) {
-        birdsRef.current = Array.from({ length: birdCount }, () => 
-            new Bird(canvas.width, canvas.height, color1)
-        );
-    }
+    return () => {
+      window.removeEventListener('widgetPosition' as any, handleWidgetPosition as EventListener);
+      window.removeEventListener('widgetHover' as any, handleWidgetHover as EventListener);
+    };
+  }, []);
 
-    const animate = () => {
-      // Clear with transparency for trail effect or solid for clean look
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Create avoidance zones only when widgets are actively hovered (very minimal)
+  useEffect(() => {
+    const setupAvoidance = () => {
+      if (!vantaEffectRef.current || !vantaRef.current) return;
+
+      const interval = setInterval(() => {
+        if (!vantaEffectRef.current || !vantaRef.current) return;
+
+        // Only create very gentle avoidance when a widget is actively being hovered
+        // This allows birds to fly freely across the screen otherwise
+        if (avoidanceActiveRef.current && hoveredWidgetRef.current) {
+          const widget = hoveredWidgetRef.current;
+          const centerX = widget.x + widget.width / 2;
+          const centerY = widget.y + widget.height / 2;
+          
+          // Create a very gentle repulsion zone - only trigger occasionally
+          // Use a random chance to make it less aggressive
+          if (Math.random() > 0.7) { // Only 30% of the time
+            const event = new MouseEvent('mousemove', {
+              clientX: centerX,
+              clientY: centerY,
+              bubbles: true,
+            });
+            vantaRef.current.dispatchEvent(event);
+          }
+        }
+      }, 300); // Update less frequently to allow natural movement
+
+      return interval;
+    };
+
+    let interval: NodeJS.Timeout | null = null;
+    
+    // Try to setup immediately if Vanta is ready
+    if (vantaEffectRef.current) {
+      interval = setupAvoidance();
+    } else {
+      // Wait for Vanta to initialize
+      const checkInterval = setInterval(() => {
+        if (vantaEffectRef.current) {
+          interval = setupAvoidance();
+          clearInterval(checkInterval);
+        }
+      }, 200);
       
-      // Optional: Background color fill if not handled by parent
-      // ctx.fillStyle = darkMode ? '#0a0a0a' : '#f5f5f5';
-      // ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      birdsRef.current.forEach(bird => {
-        bird.color = darkMode ? '#404040' : '#a0a0a0'; // Update color based on mode
-        bird.update(birdsRef.current, mouseRef.current.x, mouseRef.current.y);
-        bird.draw(ctx);
-      });
-
-      requestRef.current = requestAnimationFrame(animate);
-    };
-
-    requestRef.current = requestAnimationFrame(animate);
-
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY };
-    };
-    const handleMouseLeave = () => {
-      mouseRef.current = { x: -1, y: -1 };
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseout', handleMouseLeave);
+      setTimeout(() => clearInterval(checkInterval), 10000);
+    }
 
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseout', handleMouseLeave);
-      if (requestRef.current) {
-        cancelAnimationFrame(requestRef.current);
+      if (interval) clearInterval(interval);
+    };
+  }, []);
+
+  // Initialize Vanta effect
+  useEffect(() => {
+    const initVanta = () => {
+      if (vantaEffectRef.current || !(window as any).VANTA || !vantaRef.current) {
+        return;
+      }
+      
+      try {
+        // Optimize for mobile: reduce quantity and disable on very small screens
+        const currentIsMobile = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const shouldRender = !currentIsMobile || window.innerWidth >= 375;
+        const birdQuantity = currentIsMobile ? 1.00 : 2.00;
+        
+        if (shouldRender) {
+          const effect = (window as any).VANTA.BIRDS({
+            el: vantaRef.current,
+            mouseControls: !currentIsMobile,
+            touchControls: currentIsMobile,
+            gyroControls: false,
+            minHeight: 0.00,
+            minWidth: 0.00,
+            scale: currentIsMobile ? 0.8 : 1.00,
+            scaleMobile: 0.8,
+            backgroundColor: darkMode ? 0x020617 : 0xf5f5f5,
+            color1: 0x404040,
+            color2: 0x808080,
+            colorMode: "variance",
+            birdSize: currentIsMobile ? 0.8 : 1.0,
+            wingSpan: currentIsMobile ? 15.00 : 20.00,
+            speedLimit: currentIsMobile ? 2.50 : 4.00,
+            separation: currentIsMobile ? 40.00 : 60.00,
+            alignment: currentIsMobile ? 15.00 : 25.00,
+            cohesion: currentIsMobile ? 10.00 : 15.00,
+            quantity: currentIsMobile ? 1.00 : 3.00,
+            backgroundAlpha: 1.0
+          });
+          vantaEffectRef.current = effect;
+        }
+      } catch (e) {
+        console.error("Failed to initialize Vanta", e);
       }
     };
+
+    // Try to initialize immediately if Vanta is already loaded
+    if ((window as any).VANTA) {
+      initVanta();
+    } else {
+      // Wait for Vanta to load
+      const checkVanta = setInterval(() => {
+        if ((window as any).VANTA) {
+          initVanta();
+          clearInterval(checkVanta);
+        }
+      }, 200);
+      
+      // Cleanup after 10 seconds if Vanta doesn't load
+      const timeout = setTimeout(() => {
+        clearInterval(checkVanta);
+      }, 10000);
+      
+      return () => {
+        clearInterval(checkVanta);
+        clearTimeout(timeout);
+      };
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (vantaEffectRef.current) {
+        try {
+          vantaEffectRef.current.destroy();
+        } catch (e) {
+          console.error("Error destroying Vanta effect", e);
+        }
+        vantaEffectRef.current = null;
+      }
+    };
+  }, []); // Only run once on mount
+
+  // Update background color when darkMode changes
+  useEffect(() => {
+    if (vantaEffectRef.current) {
+      vantaEffectRef.current.setOptions({
+        backgroundColor: darkMode ? 0x020617 : 0xf5f5f5,
+        color1: darkMode ? 0x404040 : 0x808080,
+      });
+    }
   }, [darkMode]);
 
-  return (
-    <div className={`fixed inset-0 z-0 pointer-events-none transition-colors duration-1000 ${darkMode ? 'bg-[#020617]' : 'bg-gray-100'}`}>
-        <canvas ref={canvasRef} className="block w-full h-full" />
-    </div>
-  );
+  return <div ref={vantaRef} className="fixed inset-0 pointer-events-none transition-colors duration-1000" style={{ zIndex: 5 }} />;
 };
 
 export default React.memo(ParticleBackground);

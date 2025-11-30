@@ -28,7 +28,7 @@ const Dock: React.FC = () => {
   }, [location.pathname]);
 
   return (
-    <div className="fixed bottom-4 sm:bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 z-40 animate-fade-in flex justify-center w-full px-2 sm:px-0" style={{ overflow: 'visible', pointerEvents: 'none' }}>
+    <div className="fixed bottom-4 sm:bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 z-40 animate-fade-in flex justify-center w-full px-2 sm:px-0 pb-safe" style={{ overflow: 'visible', pointerEvents: 'none' }}>
       {/* Subtle glow effect behind the dock */}
       <div className="absolute inset-0 -bottom-3 blur-3xl opacity-30 dark:opacity-20 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full -z-10 animate-pulse-slow"></div>
       

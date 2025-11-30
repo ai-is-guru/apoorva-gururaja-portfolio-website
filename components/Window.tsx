@@ -14,7 +14,7 @@ const Window: React.FC<WindowProps> = ({ title, icon, children, className = "" }
   const navigate = useNavigate();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 animate-pop-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 animate-pop-in safe-area-inset">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity touch-manipulation" 
@@ -22,7 +22,7 @@ const Window: React.FC<WindowProps> = ({ title, icon, children, className = "" }
       ></div>
 
       {/* Modal Content - Fixed standard size for uniformity */}
-      <div className="relative w-full sm:w-[95vw] md:w-[90vw] max-w-6xl h-[95vh] sm:h-[90vh] md:h-[85vh] bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-white/20 dark:border-white/5 perspective-container transform transition-all duration-300">
+      <div className="relative w-full sm:w-[95vw] md:w-[90vw] max-w-6xl h-[95vh] sm:h-[90vh] md:h-[85vh] max-h-[calc(100vh-env(safe-area-inset-top)-env(safe-area-inset-bottom))] bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-white/20 dark:border-white/5 perspective-container transform transition-all duration-300">
         
         {/* Minimal Header */}
         <div className="flex items-center justify-between px-4 sm:px-5 md:px-6 py-3 sm:py-4 md:py-5 border-b border-gray-100/50 dark:border-white/5 bg-white/50 dark:bg-black/20 z-10 flex-shrink-0">

@@ -58,7 +58,7 @@ const AppContent: React.FC = () => {
       </div>
 
       {/* UI Layer */}
-      <div className="relative z-10 h-full w-full flex flex-col">
+      <div className="relative z-20 h-full w-full flex flex-col">
         <TopBar 
           darkMode={darkMode} 
           toggleDarkMode={toggleDarkMode}

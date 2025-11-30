@@ -19,9 +19,49 @@ const TiltCard = ({ children, className = "", to, onClick, image, variant = 'gla
   const ref = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
   const lastEventRef = useRef<React.MouseEvent | null>(null);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  useEffect(() => {
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  }, []);
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    // Skip tilt effect on touch devices for better performance
+    if (isTouchDevice) return;
     lastEventRef.current = e;
+    
+    // Update widget position and hover for bird avoidance
+    if (ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      const widgetId = ref.current.getAttribute('data-widget-id');
+      
+      if (widgetId) {
+        const positionEvent = new CustomEvent('widgetPosition', {
+          detail: {
+            id: widgetId,
+            x: rect.left,
+            y: rect.top,
+            width: rect.width,
+            height: rect.height
+          }
+        });
+        window.dispatchEvent(positionEvent);
+      }
+      
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      
+      const hoverEvent = new CustomEvent('widgetHover', {
+        detail: { 
+          x: centerX, 
+          y: centerY, 
+          active: true,
+          width: rect.width,
+          height: rect.height
+        }
+      });
+      window.dispatchEvent(hoverEvent);
+    }
     
     if (rafRef.current === null) {
       rafRef.current = requestAnimationFrame(() => {
@@ -49,6 +89,37 @@ const TiltCard = ({ children, className = "", to, onClick, image, variant = 'gla
     }
   };
 
+  const handleMouseEnter = (e: React.MouseEvent) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    // Generate unique ID for this widget
+    const widgetId = ref.current.getAttribute('data-widget-id') || `widget-${Math.random().toString(36).substr(2, 9)}`;
+    if (!ref.current.getAttribute('data-widget-id')) {
+      ref.current.setAttribute('data-widget-id', widgetId);
+    }
+    
+    // Emit widget position update
+    const positionEvent = new CustomEvent('widgetPosition', {
+      detail: {
+        id: widgetId,
+        x: rect.left,
+        y: rect.top,
+        width: rect.width,
+        height: rect.height
+      }
+    });
+    window.dispatchEvent(positionEvent);
+    
+    // Emit custom event for widget hover
+    const hoverEvent = new CustomEvent('widgetHover', {
+      detail: { x: centerX, y: centerY, active: true }
+    });
+    window.dispatchEvent(hoverEvent);
+  };
+
   const handleMouseLeave = () => {
     if (rafRef.current !== null) {
       cancelAnimationFrame(rafRef.current);
@@ -58,6 +129,12 @@ const TiltCard = ({ children, className = "", to, onClick, image, variant = 'gla
     
     if (!ref.current) return;
     ref.current.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+    
+    // Emit custom event for widget leave
+    const event = new CustomEvent('widgetHover', {
+      detail: { x: 0, y: 0, active: false }
+    });
+    window.dispatchEvent(event);
   };
 
   // Base styles:
@@ -79,13 +156,14 @@ const TiltCard = ({ children, className = "", to, onClick, image, variant = 'gla
   const Content = (
     <div 
       ref={ref}
+      onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
       className={`relative h-full w-full overflow-hidden rounded-2xl 
-        border transition-all duration-300 group
+        border transition-all duration-300 group touch-manipulation
         ${themeClasses} ${className}`}
-      style={{ transformStyle: 'preserve-3d', transition: 'transform 0.1s ease-out' }}
+      style={{ transformStyle: 'preserve-3d', transition: 'transform 0.1s ease-out', zIndex: 10, position: 'relative', WebkitTapHighlightColor: 'transparent', pointerEvents: 'auto' }}
     >
       {/* Background Image Layer */}
       {image && (
@@ -144,8 +222,41 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
     return () => clearInterval(interval);
   }, []);
 
+  // Track all widget positions for bird avoidance
+  useEffect(() => {
+    const updateWidgetPositions = () => {
+      const widgets = document.querySelectorAll('[data-widget-id]');
+      widgets.forEach((widget) => {
+        const rect = widget.getBoundingClientRect();
+        const widgetId = widget.getAttribute('data-widget-id');
+        if (widgetId) {
+          const positionEvent = new CustomEvent('widgetPosition', {
+            detail: {
+              id: widgetId,
+              x: rect.left,
+              y: rect.top,
+              width: rect.width,
+              height: rect.height
+            }
+          });
+          window.dispatchEvent(positionEvent);
+        }
+      });
+    };
+
+    // Update positions on mount and resize
+    updateWidgetPositions();
+    window.addEventListener('resize', updateWidgetPositions);
+    const interval = setInterval(updateWidgetPositions, 1000); // Update every second
+
+    return () => {
+      window.removeEventListener('resize', updateWidgetPositions);
+      clearInterval(interval);
+    };
+  }, []);
+
   return (
-    <div className="h-full w-full overflow-y-auto thin-scrollbar pb-32 sm:pb-40 md:pb-32 pt-24 sm:pt-28 md:pt-24 px-3 sm:px-4 md:px-6">
+    <div className="h-full w-full overflow-y-auto thin-scrollbar pb-32 sm:pb-40 md:pb-32 pt-20 sm:pt-24 md:pt-28 px-3 sm:px-4 md:px-6 safe-area-inset">
       {/* 
          Grid Layout Strategy (4 Columns):
          Row 1: Profile (2x2), Theme (1x1), Map (1x1)
@@ -153,7 +264,7 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
          Row 3: Career (1x1), Podcast (1x2), Social (1x1)
          Row 4: Blog (2x1), Podcast (cont), Shop (1x1)
       */}
-      <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-2.5 sm:gap-3 auto-rows-[200px] sm:auto-rows-[220px] md:auto-rows-[240px]">
+      <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-2 sm:gap-2.5 md:gap-3 auto-rows-[180px] sm:auto-rows-[200px] md:auto-rows-[220px] lg:auto-rows-[240px]">
         
         {/* 1. Profile / Bio - Large Block (2x2) */}
         <div className="col-span-1 md:col-span-2 row-span-2">
@@ -199,8 +310,8 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
                             </div>
                         </div>
                         
-                        {/* Coffee Icon with Steam Animation - Centered, moved down */}
-                        <div className="flex flex-col items-center justify-center flex-1 pt-4 sm:pt-5 md:pt-6 pb-2 min-h-0">
+                        {/* Coffee Icon with Steam Animation - Positioned lower */}
+                        <div className="flex flex-col items-center justify-start flex-1 min-h-0 mt-24 sm:mt-28 md:mt-32">
                             <div className="relative flex items-center justify-center mb-2 sm:mb-3">
                                 <div className="absolute inset-0 bg-amber-200/20 dark:bg-amber-400/10 rounded-full blur-xl -z-10"></div>
                                 <Coffee size={48} className="sm:w-14 sm:h-14 md:w-16 md:h-16 text-amber-600 dark:text-amber-400 drop-shadow-xl relative z-10 transition-transform duration-300 group-hover:scale-110" strokeWidth={2.5} />
@@ -255,23 +366,20 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
         <div className="col-span-1 row-span-1">
             <TiltCard 
                 to="/calendar"
-                className="p-3 sm:p-4 md:p-5 flex flex-col justify-between hover:bg-slate-50 dark:hover:bg-neutral-800 transition-colors group"
+                className="p-3 sm:p-4 md:p-5 flex flex-col hover:bg-slate-50 dark:hover:bg-neutral-800 transition-colors group relative"
             >
-                <div className="flex justify-between items-start mb-2">
+                <div className="flex justify-start items-start absolute top-3 left-0 sm:top-4 md:top-5 pl-3 sm:pl-4 md:pl-5">
                     <div className="flex items-center space-x-1.5 sm:space-x-2 text-slate-500 dark:text-neutral-500 uppercase tracking-widest text-xs sm:text-sm font-bold">
                         <CalendarIcon size={12} className="sm:w-4 sm:h-4" />
                         <span>Calendar</span>
                     </div>
-                    <div className="p-2 sm:p-2.5 bg-slate-100 dark:bg-white/5 rounded-full border border-slate-200 dark:border-white/10 group-hover:bg-slate-200 dark:group-hover:bg-white/10 transition-colors">
-                        <ArrowUpRight className="text-slate-900 dark:text-white sm:w-5 sm:h-5" size={16} />
-                    </div>
                 </div>
-                <div className="flex flex-col justify-center flex-1">
-                    <div className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-slate-900 dark:text-white mb-1 leading-none">
+                <div className="flex flex-col items-center justify-center flex-1 h-full">
+                    <div className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-slate-900 dark:text-white mb-1 leading-none text-center">
                         {new Date().getDate()}
                     </div>
-                    <div className="text-xs sm:text-sm text-slate-600 dark:text-neutral-400 font-medium">
-                        {new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                    <div className="text-xs sm:text-sm text-slate-600 dark:text-neutral-400 font-medium text-center">
+                        {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
                     </div>
                 </div>
             </TiltCard>
@@ -327,12 +435,13 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
                 className="group p-0 border-neutral-800 transition-all duration-1000 bg-neutral-900 relative"
              >
                  {/* Slideshow Background */}
-                 <div className="absolute inset-0 z-0">
+                 <div className="absolute inset-0 z-0 flex items-center justify-center overflow-hidden bg-neutral-950">
                      <img 
                         src={GALLERY_IMAGES[galleryIndex].src} 
                         alt="Gallery Slideshow"
                         loading="lazy"
-                        className="w-full h-full object-cover object-center transition-opacity duration-1000 opacity-60 group-hover:scale-105"
+                        className="w-full h-full object-contain transition-opacity duration-1000 opacity-60 group-hover:scale-105"
+                        style={{ objectPosition: 'center center' }}
                      />
                  </div>
                  {/* Gradient Overlay */}
@@ -387,8 +496,8 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
         <div className="col-span-1 row-span-1">
             <TiltCard to="/contact" className="p-6 flex flex-col justify-center items-center gap-5 hover:bg-slate-50 dark:hover:bg-neutral-800">
                 <div className="flex -space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-neutral-800 flex items-center justify-center text-slate-700 dark:text-white border-2 border-white dark:border-neutral-900 z-30 group-hover:-translate-y-1 transition-transform"><Linkedin size={18} /></div>
-                    <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-neutral-800 flex items-center justify-center text-slate-700 dark:text-white border-2 border-white dark:border-neutral-900 z-20 group-hover:-translate-y-1 transition-transform delay-75"><Github size={18} /></div>
+                    <div className="w-14 h-14 rounded-full bg-slate-200 dark:bg-neutral-800 flex items-center justify-center text-slate-700 dark:text-white border-2 border-white dark:border-neutral-900 z-30 group-hover:-translate-y-1 transition-transform"><Linkedin size={24} /></div>
+                    <div className="w-14 h-14 rounded-full bg-slate-200 dark:bg-neutral-800 flex items-center justify-center text-slate-700 dark:text-white border-2 border-white dark:border-neutral-900 z-20 group-hover:-translate-y-1 transition-transform delay-75"><Github size={24} /></div>
                 </div>
                 <div className="text-xs font-bold text-slate-400 dark:text-neutral-400 uppercase tracking-widest">Connect</div>
             </TiltCard>

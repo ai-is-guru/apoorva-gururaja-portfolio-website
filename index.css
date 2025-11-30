@@ -49,3 +49,72 @@
   }
 }
 
+/* Safe Area Insets for iPhone notches and Android navigation bars */
+@supports (padding: max(0px)) {
+  .safe-area-inset {
+    padding-top: max(env(safe-area-inset-top), 0px);
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
+    padding-left: max(env(safe-area-inset-left), 0px);
+    padding-right: max(env(safe-area-inset-right), 0px);
+  }
+  
+  .pt-safe {
+    padding-top: max(env(safe-area-inset-top), 0px);
+  }
+  
+  .pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
+  }
+  
+  .pl-safe {
+    padding-left: max(env(safe-area-inset-left), 0px);
+  }
+  
+  .pr-safe {
+    padding-right: max(env(safe-area-inset-right), 0px);
+  }
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 767px) {
+  /* Improve touch targets - minimum 44x44px */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Better text readability on mobile */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  
+  /* Prevent text size adjustment on iOS */
+  html {
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  /* Improve scrolling on iOS */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Android specific fixes */
+@supports (-webkit-appearance: none) {
+  /* Fix for Android Chrome address bar */
+  @media (max-width: 767px) {
+    body {
+      min-height: -webkit-fill-available;
+    }
+    
+    html {
+      height: -webkit-fill-available;
+    }
+  }
+}
+
