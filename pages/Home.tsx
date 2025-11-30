@@ -365,8 +365,7 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
         {/* 4. Calendar Widget - Small Block (1x1) */}
         <div className="col-span-1 row-span-1">
             <TiltCard 
-                to="/calendar"
-                className="p-3 sm:p-4 md:p-5 flex flex-col hover:bg-slate-50 dark:hover:bg-neutral-800 transition-colors group relative"
+                className="p-3 sm:p-4 md:p-5 flex flex-col group relative"
             >
                 <div className="flex justify-start items-start absolute top-3 left-0 sm:top-4 md:top-5 pl-3 sm:pl-4 md:pl-5">
                     <div className="flex items-center space-x-1.5 sm:space-x-2 text-slate-500 dark:text-neutral-500 uppercase tracking-widest text-xs sm:text-sm font-bold">
