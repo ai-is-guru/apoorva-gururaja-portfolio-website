@@ -26,7 +26,7 @@ const TopBar: React.FC<TopBarProps> = ({ darkMode, toggleDarkMode, isSpotifyPlay
   }, [time]);
 
   return (
-    <div className="fixed top-4 left-4 right-4 sm:top-5 sm:left-5 sm:right-5 md:top-6 md:left-6 md:right-6 z-50 flex justify-between items-center pointer-events-none gap-2 sm:gap-3 md:gap-4 pt-safe">
+    <div className="fixed top-2 left-2 right-2 sm:top-4 sm:left-4 sm:right-4 md:top-6 md:left-6 md:right-6 z-50 flex justify-between items-center pointer-events-none gap-2 sm:gap-3 md:gap-4 pt-safe">
       {/* Brand - Removed */}
 
       {/* Right Controls */}

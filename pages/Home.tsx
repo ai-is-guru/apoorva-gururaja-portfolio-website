@@ -219,7 +219,7 @@ interface WidgetConfig {
 }
 
 const DEFAULT_WIDGET_ORDER: WidgetId[] = [
-  'skills', 'case-studies', 'status', 'profile', 'theme', 'calendar', 
+  'profile', 'skills', 'case-studies', 'status', 'theme', 'calendar', 
   'spotify', 'gallery', 'podcast', 'social', 'blog', 'shop', 'tools'
 ];
 
@@ -377,6 +377,7 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
         return DEFAULT_WIDGET_ORDER;
       }
     }
+    // For new users (no saved order), use default which has 'profile' first
     return DEFAULT_WIDGET_ORDER;
   });
   // Store the original order (without filter applied) - persist across filter changes
@@ -745,9 +746,9 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
         );
       case 'profile':
         return (
-          <TiltCard to="/about" className="h-full flex flex-col p-4 sm:p-6 md:p-8 justify-between" data-category="About">
-            <div className="flex justify-between items-start mb-4 sm:mb-0">
-              <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full overflow-hidden bg-white/5 border-2 sm:border-4 border-slate-100 dark:border-white/10 shadow-lg group-hover:scale-105 transition-all duration-500">
+          <TiltCard to="/about" className="h-full flex flex-col p-3 sm:p-5 md:p-8 justify-between" data-category="About">
+            <div className="flex justify-between items-start mb-3 sm:mb-0">
+              <div className="w-20 h-20 sm:w-28 sm:h-28 md:w-40 md:h-40 rounded-full overflow-hidden bg-white/5 border-2 sm:border-4 border-slate-100 dark:border-white/10 shadow-lg group-hover:scale-105 transition-all duration-500">
                 <img 
                   src="https://res.cloudinary.com/dxa01fjve/image/upload/c_thumb,g_face,w_400,h_400,q_auto,f_auto/v1764395976/IMG_1106_reb90r.jpg" 
                   alt="Apoorva" 
@@ -755,15 +756,15 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
                   className="w-full h-full object-cover" 
                 />
               </div>
-              <div className="p-2 sm:p-2.5 md:p-3 bg-slate-100 dark:bg-white/5 rounded-full border border-slate-200 dark:border-white/10 group-hover:bg-slate-200 dark:group-hover:bg-white/10 transition-colors">
-                <ArrowUpRight className="text-slate-900 dark:text-white sm:w-5 sm:h-5 md:w-6 md:h-6" size={18} />
+              <div className="p-1.5 sm:p-2.5 md:p-3 bg-slate-100 dark:bg-white/5 rounded-full border border-slate-200 dark:border-white/10 group-hover:bg-slate-200 dark:group-hover:bg-white/10 transition-colors">
+                <ArrowUpRight className="text-slate-900 dark:text-white sm:w-5 sm:h-5 md:w-6 md:h-6" size={16} />
               </div>
             </div>
             <div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-slate-900 dark:text-white mb-2 sm:mb-3 tracking-tight leading-tight">
+              <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-semibold text-slate-900 dark:text-white mb-1.5 sm:mb-3 tracking-tight leading-tight">
                 I'm Apoorva,
               </h1>
-              <p className="text-sm sm:text-base md:text-lg text-slate-600 dark:text-neutral-400 font-normal leading-relaxed tracking-normal">
+              <p className="text-xs sm:text-sm md:text-lg text-slate-600 dark:text-neutral-400 font-normal leading-relaxed tracking-normal">
                 a Technical Program Manager based in Mountain View, CA, working across AI, product execution, and cross-functional delivery. I'm driven by AI innovation, operational rigor, and advancing the craft of program management.
               </p>
             </div>
@@ -1050,7 +1051,7 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
   }, []);
 
   return (
-    <div className="h-full w-full overflow-y-auto thin-scrollbar pb-48 sm:pb-52 md:pb-56 lg:pb-60 pt-20 sm:pt-24 md:pt-28 px-3 sm:px-4 md:px-6 safe-area-inset" style={{ paddingBottom: 'max(240px, env(safe-area-inset-bottom, 0px) + 240px)' }}>
+    <div className="h-full w-full overflow-y-auto thin-scrollbar pb-32 sm:pb-48 md:pb-56 lg:pb-60 pt-16 sm:pt-20 md:pt-24 px-2 sm:px-4 md:px-6 safe-area-inset" style={{ paddingBottom: 'max(200px, env(safe-area-inset-bottom, 0px) + 200px)' }}>
       <FilterBar 
         activeFilters={activeFilter ? [activeFilter] : []} 
         onFilterToggle={handleFilterToggle}
@@ -1058,13 +1059,13 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
       />
       {/* 
          Grid Layout Strategy (4 Columns):
-         Row 1: Skills (2x1), Case Studies (2x1) - Career focused at top
-         Row 2: Status (1x2), Profile (2x2), Theme (1x1)
-         Row 3: Status (cont), Profile (cont), Calendar (1x1), Spotify (2x1)
-         Row 4: Gallery (1x1), Podcast (1x2), Social (1x1), Blog (2x1)
+         Row 1: Profile (2x2) - Profile first for new users
+         Row 2: Skills (2x1), Case Studies (2x1) - Career focused
+         Row 3: Status (1x2), Theme (1x1), Calendar (1x1)
+         Row 4: Spotify (2x1), Gallery (1x1), Podcast (1x2), Social (1x1), Blog (2x1)
       */}
       <div 
-        className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-2 sm:gap-2.5 md:gap-3 auto-rows-[180px] sm:auto-rows-[200px] md:auto-rows-[220px] lg:auto-rows-[240px] relative" 
+        className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-2 sm:gap-2.5 md:gap-3 auto-rows-[160px] sm:auto-rows-[180px] md:auto-rows-[220px] lg:auto-rows-[240px] relative" 
         style={{ isolation: 'isolate', gridAutoFlow: 'row dense' }}
         onDragOver={(e) => {
           e.preventDefault();
