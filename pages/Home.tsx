@@ -329,9 +329,9 @@ const SkillsWidget: React.FC = () => {
             e.stopPropagation();
             navigate('/skills');
           }}
-          className="p-1.5 sm:p-2 bg-slate-100 dark:bg-white/5 rounded-full border border-slate-200 dark:border-white/10 group-hover:bg-slate-200 dark:group-hover:bg-white/10 transition-colors"
+          className="p-1.5 sm:p-2 bg-slate-100 dark:bg-white/5 rounded-full border border-slate-200 dark:border-white/10 group-hover:bg-slate-200 dark:group-hover:bg-white/10 transition-colors flex items-center justify-center flex-shrink-0"
         >
-          <ArrowUpRight className="text-slate-900 dark:text-white sm:w-4 sm:h-4" size={14} />
+          <ArrowUpRight className="text-slate-900 dark:text-white w-3.5 h-3.5 sm:w-4 sm:h-4" size={14} />
         </button>
       </div>
 
@@ -366,19 +366,34 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
   const [widgetOrder, setWidgetOrder] = useState<WidgetId[]>(() => {
     // Load from localStorage or use default
     const saved = localStorage.getItem('widget-order');
+    let order: WidgetId[];
+    
     if (saved) {
       try {
         const savedOrder = JSON.parse(saved);
         // Merge saved order with default to include any new widgets
         const savedSet = new Set(savedOrder);
         const newWidgets = DEFAULT_WIDGET_ORDER.filter(id => !savedSet.has(id));
-        return [...savedOrder, ...newWidgets];
+        order = [...savedOrder, ...newWidgets];
       } catch {
-        return DEFAULT_WIDGET_ORDER;
+        order = DEFAULT_WIDGET_ORDER;
       }
+    } else {
+      // For new users (no saved order), use default which has 'profile' first
+      order = DEFAULT_WIDGET_ORDER;
     }
-    // For new users (no saved order), use default which has 'profile' first
-    return DEFAULT_WIDGET_ORDER;
+    
+    // Always ensure 'profile' is first, regardless of saved order
+    const profileIndex = order.indexOf('profile');
+    if (profileIndex > 0) {
+      // Remove profile from its current position and place it at the front
+      order = ['profile', ...order.filter(id => id !== 'profile')];
+    } else if (profileIndex === -1) {
+      // Profile not found, add it at the front
+      order = ['profile', ...order];
+    }
+    
+    return order;
   });
   // Store the original order (without filter applied) - persist across filter changes
   const originalWidgetOrderRef = useRef<WidgetId[]>([]);
@@ -422,8 +437,17 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
   useEffect(() => {
     // Only update original order if no filter is active (to preserve user's custom order)
     if (!activeFilter || activeFilter === 'All') {
-      originalWidgetOrderRef.current = [...widgetOrder];
-      localStorage.setItem('widget-order', JSON.stringify(widgetOrder));
+      // Always ensure 'profile' is first before saving
+      let orderToSave = [...widgetOrder];
+      const profileIndex = orderToSave.indexOf('profile');
+      if (profileIndex > 0) {
+        orderToSave = ['profile', ...orderToSave.filter(id => id !== 'profile')];
+      } else if (profileIndex === -1) {
+        orderToSave = ['profile', ...orderToSave];
+      }
+      
+      originalWidgetOrderRef.current = orderToSave;
+      localStorage.setItem('widget-order', JSON.stringify(orderToSave));
     }
   }, [widgetOrder, activeFilter]);
 
@@ -470,7 +494,15 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
       
       // If clearing filter or selecting "All", restore original order
       if (!newFilter || newFilter === 'All') {
-        setWidgetOrder([...originalWidgetOrderRef.current]);
+        let restoredOrder = [...originalWidgetOrderRef.current];
+        // Ensure 'profile' is first
+        const profileIndex = restoredOrder.indexOf('profile');
+        if (profileIndex > 0) {
+          restoredOrder = ['profile', ...restoredOrder.filter(id => id !== 'profile')];
+        } else if (profileIndex === -1) {
+          restoredOrder = ['profile', ...restoredOrder];
+        }
+        setWidgetOrder(restoredOrder);
       } else {
         // When a filter is applied, reorder widgets to bring filtered ones to the top
         const filteredWidgets = FILTER_WIDGET_MAP[newFilter] || [];
@@ -492,8 +524,16 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
           }
         });
         
-        // New order: filtered widgets first, then others, then always-visible widgets last
-        setWidgetOrder([...filtered, ...others, ...alwaysVisible]);
+        // New order: profile first (if in filtered), then other filtered widgets, then others, then always-visible widgets last
+        let newOrder: WidgetId[] = [];
+        const profileInFiltered = filtered.includes('profile');
+        if (profileInFiltered) {
+          newOrder = ['profile', ...filtered.filter(id => id !== 'profile'), ...others, ...alwaysVisible];
+        } else {
+          // Even if profile is not in filtered widgets, keep it first
+          newOrder = ['profile', ...filtered, ...others.filter(id => id !== 'profile'), ...alwaysVisible];
+        }
+        setWidgetOrder(newOrder);
       }
       
       return newFilter;

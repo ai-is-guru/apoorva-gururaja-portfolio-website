@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
-import Window from '../components/Window';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
 
 const Calendar: React.FC = () => {
+  const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const year = currentDate.getFullYear();
@@ -73,10 +74,27 @@ const Calendar: React.FC = () => {
   };
 
   return (
-    <Window title="Calendar" icon={<CalendarIcon size={12} className="text-blue-500" />}>
-      <div className="bg-white dark:bg-slate-950 min-h-full p-6 sm:p-8 md:p-12">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
+    <div className="h-full w-full overflow-y-auto thin-scrollbar pb-20 px-4 sm:px-6 md:px-8 lg:px-12 pt-20 sm:pt-24 md:pt-28">
+      <div className="max-w-4xl mx-auto">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate('/')}
+          className="mb-6 sm:mb-8 flex items-center gap-2 text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white transition-colors group"
+        >
+          <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+          <span className="text-sm font-medium">Back to Home</span>
+        </button>
+
+        {/* Header */}
+        <div className="mb-8 sm:mb-12">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold text-slate-900 dark:text-white mb-4 sm:mb-6 leading-tight tracking-tight">
+            Calendar
+          </h1>
+        </div>
+
+        {/* Calendar Container */}
+        <div className="bg-white/80 dark:bg-black/60 backdrop-blur-md rounded-2xl p-6 sm:p-8 md:p-12 border border-white/30 dark:border-white/10 shadow-xl">
+          {/* Header Controls */}
           <div className="flex items-center justify-center relative mb-8">
             <div className="flex items-center gap-4">
               <button
@@ -126,9 +144,8 @@ const Calendar: React.FC = () => {
           </div>
         </div>
       </div>
-    </Window>
+    </div>
   );
 };
 
 export default Calendar;
-

@@ -1,24 +1,44 @@
 
 import React from 'react';
-import Window from '../components/Window';
-import { Mic, Construction } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Mic, Construction, ArrowLeft } from 'lucide-react';
 
 const AlignedIntelligence: React.FC = () => {
+  const navigate = useNavigate();
 
   return (
-    <Window title="Aligned Intelligence Podcast" icon={<Mic size={12} className="text-purple-500" />} maxWidth="max-w-5xl">
-      <div className="bg-white dark:bg-slate-900 min-h-full p-8 flex flex-col items-center justify-center">
-        <div className="max-w-md text-center">
+    <div className="h-full w-full overflow-y-auto thin-scrollbar pb-20 px-4 sm:px-6 md:px-8 lg:px-12 pt-20 sm:pt-24 md:pt-28">
+      <div className="max-w-5xl mx-auto">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate('/')}
+          className="mb-6 sm:mb-8 flex items-center gap-2 text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white transition-colors group"
+        >
+          <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+          <span className="text-sm font-medium">Back to Home</span>
+        </button>
+
+        {/* Header */}
+        <div className="mb-8 sm:mb-12">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold text-slate-900 dark:text-white mb-4 sm:mb-6 leading-tight tracking-tight">
+            Aligned Intelligence Podcast
+          </h1>
+        </div>
+
+        {/* Content */}
+        <div className="bg-white/80 dark:bg-black/60 backdrop-blur-md rounded-2xl p-8 sm:p-12 md:p-16 flex flex-col items-center justify-center border border-white/30 dark:border-white/10 shadow-xl min-h-[400px]">
+          <div className="max-w-md text-center">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-purple-100 dark:bg-purple-900/30 rounded-full mb-6">
-                <Construction size={40} className="text-purple-500" />
+              <Construction size={40} className="text-purple-500" />
             </div>
-            <h1 className="text-4xl font-semibold text-slate-900 dark:text-white mb-4 tracking-tight leading-tight">Coming Soon</h1>
-            <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-lg">
-                The Aligned Intelligence podcast is currently in production. I'll be interviewing leaders in AI and Tech. Stay tuned!
+            <h2 className="text-4xl font-semibold text-slate-900 dark:text-white mb-4 tracking-tight leading-tight">Coming Soon</h2>
+            <p className="text-slate-500 dark:text-neutral-400 leading-relaxed text-lg font-normal tracking-normal">
+              The Aligned Intelligence podcast is currently in production. I'll be interviewing leaders in AI and Tech. Stay tuned!
             </p>
+          </div>
         </div>
       </div>
-    </Window>
+    </div>
   );
 };
 
