@@ -10,7 +10,7 @@ const Passion: React.FC = () => {
     <Window title="Gallery" icon={<ImageIcon size={12} className="text-rose-500" />}>
       <div className="p-8 bg-white min-h-full">
          <div className="flex justify-between items-center mb-8">
-             <h1 className="text-3xl font-serif font-bold text-slate-900">Photo Gallery</h1>
+             <h1 className="text-3xl font-semibold text-slate-900 tracking-tight leading-tight">Photo Gallery</h1>
          </div>
 
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

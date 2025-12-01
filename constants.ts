@@ -1,6 +1,6 @@
 
 
-import { Job, Passion, BlogPost, LifestyleItem, PodcastEpisode } from './types';
+import { Job, Passion, BlogPost, LifestyleItem, PodcastEpisode, CaseStudy } from './types';
 
 export const RESUME_CONTEXT = `
 You are an AI assistant representing Apoorva Gururaja on her portfolio website. Answer questions as if you are her digital twin, based on the following resume data:
@@ -327,4 +327,52 @@ export const DESKTOP_ICONS = [
   { name: 'Project_Specs', type: 'folder' },
   { name: 'Travel_Plans', type: 'folder' },
   { name: 'Screenshots', type: 'folder' },
+];
+
+export const CASE_STUDIES: CaseStudy[] = [
+  {
+    id: 'prime-badge-consolidation',
+    title: 'Prime Badge Business Logic Consolidation',
+    theme: 'System Consolidation & Platform Migration',
+    period: 'May 2024 – Nov 2024',
+    role: 'Technical Program Manager',
+    scope: 'E-commerce Platform',
+    summary: 'Unified fragmented Prime Badge business logic scattered across multiple systems into a single federated decision engine, improving reliability, performance, and Amazon-wide CX consistency.',
+    problem: {
+      description: 'The Prime Badge code paths were fragmented across legacy and new systems. This created:',
+      bullets: [
+        'Inconsistent eligibility logic',
+        'Duplicated conditions',
+        'Higher defect rates during peak load',
+        'Difficulty onboarding new retail programs'
+      ],
+      continuation: 'CX teams lacked a single source of truth, and engineering teams often disagreed on badge-rendering rules.'
+    },
+    approach: {
+      description: '',
+      bullets: [
+        'Centralized business logic into a federated rules engine',
+        'Sequenced dependencies across Delivery Experience, Subscriptions, Retail Integrations, Payments, and Badging Infra',
+        'Created a shared eligibility spec and alignment channels across 5 teams',
+        'Reduced ambiguity by documenting all input/output conditions and regression risks',
+        'Established shared dashboards for rendering accuracy, latency, and feature-flag testing'
+      ]
+    },
+    outcome: {
+      description: '',
+      metrics: [
+        'Eliminated conflicting badge-rendering paths',
+        'Improved badge accuracy and latency for millions of product detail pages',
+        'Reduced weekly defect volume and increased developer velocity by consolidating logic into a single system'
+      ],
+      tags: [
+        'System Consolidation',
+        'Platform Migration',
+        'Federated Architecture',
+        'Cross-Functional Alignment',
+        'E-commerce Systems',
+        'Business Logic Engineering'
+      ]
+    }
+  }
 ];

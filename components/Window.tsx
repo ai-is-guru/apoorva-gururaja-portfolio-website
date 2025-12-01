@@ -30,7 +30,7 @@ const Window: React.FC<WindowProps> = ({ title, icon, children, className = "" }
              <div className="p-1.5 sm:p-2 bg-slate-100 dark:bg-white/10 rounded-full text-slate-600 dark:text-white flex-shrink-0">
                 {icon}
              </div>
-             <h2 className="text-base sm:text-lg md:text-xl font-serif font-bold text-slate-900 dark:text-white tracking-tight truncate">{title}</h2>
+             <h2 className="text-base sm:text-lg md:text-xl font-semibold text-slate-900 dark:text-white tracking-tight truncate leading-snug">{title}</h2>
           </div>
           
           <button 

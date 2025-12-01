@@ -3,7 +3,6 @@ import React, { useState, useEffect, useCallback, Suspense, lazy } from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import TopBar from './components/TopBar';
 import Dock from './components/Dock';
-import BootSequence from './components/BootSequence';
 import CustomCursor from './components/CustomCursor';
 import ParticleBackground from './components/ParticleBackground';
 import SpotifyPlayer from './components/SpotifyPlayer';
@@ -12,6 +11,8 @@ import SpotifyPlayer from './components/SpotifyPlayer';
 const Home = lazy(() => import('./pages/Home'));
 const About = lazy(() => import('./pages/About'));
 const Career = lazy(() => import('./pages/Career'));
+const Skills = lazy(() => import('./pages/Skills'));
+const CaseStudies = lazy(() => import('./pages/CaseStudies'));
 const Passion = lazy(() => import('./pages/Passion'));
 const AlignedIntelligence = lazy(() => import('./pages/AlignedIntelligence'));
 const Blog = lazy(() => import('./pages/Blog'));
@@ -21,7 +22,6 @@ const Calendar = lazy(() => import('./pages/Calendar'));
 
 const AppContent: React.FC = () => {
   const [darkMode, setDarkMode] = useState(true); // Default to Dark Mode for the "mature" vibe
-  const [booted, setBooted] = useState(false);
   const [isSpotifyPlaying, setIsSpotifyPlaying] = useState(false);
 
   useEffect(() => {
@@ -35,10 +35,6 @@ const AppContent: React.FC = () => {
   const toggleDarkMode = useCallback(() => setDarkMode(prev => !prev), []);
   const handleSpotifyPlay = useCallback(() => setIsSpotifyPlaying(true), []);
   const handleSpotifyPause = useCallback(() => setIsSpotifyPlaying(false), []);
-
-  if (!booted) {
-    return <BootSequence onComplete={() => setBooted(true)} />;
-  }
 
   return (
     <div className={`h-screen w-screen overflow-hidden font-sans relative transition-colors duration-1000 ${darkMode ? 'bg-black' : 'bg-slate-50'}`}>
@@ -84,6 +80,8 @@ const AppContent: React.FC = () => {
                /> 
                <Route path="/about" element={<About />} />
                <Route path="/career" element={<Career />} />
+               <Route path="/skills" element={<Skills />} />
+               <Route path="/case-studies" element={<CaseStudies />} />
                <Route path="/passion" element={<Passion />} />
                <Route path="/aligned-intelligence" element={<AlignedIntelligence />} />
                <Route path="/lifestyle" element={<Lifestyle />} />
@@ -95,6 +93,13 @@ const AppContent: React.FC = () => {
         </main>
 
         <Dock />
+
+        {/* Copyright Label */}
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-30 pointer-events-none">
+          <div className="text-xs sm:text-sm text-slate-500 dark:text-neutral-500 font-normal tracking-normal">
+            © {new Date().getFullYear()} Apoorva Gururaja
+          </div>
+        </div>
       </div>
     </div>
   );

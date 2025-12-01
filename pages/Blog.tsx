@@ -51,7 +51,7 @@ const Blog: React.FC = () => {
                 )}
               </div>
               
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold text-slate-900 dark:text-white mb-8 leading-[1.1] tracking-tight">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold text-slate-900 dark:text-white mb-8 leading-[1.1] tracking-tight">
                 {selectedPost.title}
               </h1>
               
@@ -69,9 +69,9 @@ const Blog: React.FC = () => {
             {/* Post Body */}
             {selectedPost.content && (
               <div className="prose prose-slate dark:prose-invert prose-lg max-w-none">
-                <div className="text-slate-700 dark:text-slate-300 leading-[1.85] text-base sm:text-lg md:text-xl space-y-8">
+                <div className="text-slate-600 dark:text-neutral-400 leading-[1.85] text-base sm:text-lg md:text-xl space-y-8">
                   {selectedPost.content.split('\n\n').map((paragraph, index) => (
-                    <p key={index} className="mb-0 font-light">
+                    <p key={index} className="mb-0 font-normal tracking-normal">
                       {paragraph}
                     </p>
                   ))}
@@ -107,7 +107,7 @@ const Blog: React.FC = () => {
               <div className="inline-flex items-center justify-center w-20 h-20 bg-orange-50 dark:bg-orange-950/30 rounded-full mb-6">
                 <Newspaper size={40} className="text-orange-500" />
               </div>
-              <h2 className="text-2xl font-serif font-bold text-slate-900 dark:text-white mb-4">
+              <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-4 tracking-tight leading-snug">
                 Coming Soon
               </h2>
               <p className="text-slate-500 dark:text-slate-400 leading-relaxed max-w-md">
@@ -151,11 +151,11 @@ const Blog: React.FC = () => {
                           )}
                         </div>
                         
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-slate-900 dark:text-white mb-4 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors leading-tight">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-slate-900 dark:text-white mb-4 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors leading-tight tracking-tight">
                           {post.title}
                         </h2>
                         
-                        <p className="text-slate-600 dark:text-slate-400 text-base sm:text-lg leading-relaxed mb-6 line-clamp-3">
+                        <p className="text-slate-600 dark:text-neutral-400 text-base sm:text-lg leading-relaxed mb-6 line-clamp-3 font-normal tracking-normal">
                           {post.excerpt}
                         </p>
                       </div>

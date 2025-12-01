@@ -27,11 +27,7 @@ const TopBar: React.FC<TopBarProps> = ({ darkMode, toggleDarkMode, isSpotifyPlay
 
   return (
     <div className="fixed top-4 left-4 right-4 sm:top-5 sm:left-5 sm:right-5 md:top-6 md:left-6 md:right-6 z-50 flex justify-between items-center pointer-events-none gap-2 sm:gap-3 md:gap-4 pt-safe">
-      {/* Brand */}
-      <div className="pointer-events-auto bg-white/20 dark:bg-black/20 backdrop-blur-md px-3 py-2 sm:px-3.5 sm:py-2 md:px-4 md:py-2.5 rounded-full border border-white/20 text-slate-900 dark:text-white font-serif font-bold tracking-wide shadow-sm flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-         <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-         <span className="text-xs sm:text-sm md:text-base">ApoorvaOS</span>
-      </div>
+      {/* Brand - Removed */}
 
       {/* Right Controls */}
       <div className="flex gap-3 sm:gap-4 md:gap-5 pointer-events-auto items-center flex-shrink min-w-0">

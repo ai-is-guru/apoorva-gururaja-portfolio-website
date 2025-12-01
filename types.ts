@@ -50,3 +50,27 @@ export interface PodcastEpisode {
   description: string;
   image: string;
 }
+
+export interface CaseStudy {
+  id: string;
+  title: string;
+  theme: string;
+  period: string;
+  role: string;
+  scope: string;
+  summary: string;
+  problem: {
+    description: string;
+    bullets: string[];
+    continuation?: string;
+  };
+  approach: {
+    description: string;
+    bullets: string[];
+  };
+  outcome: {
+    description: string;
+    metrics: string[];
+    tags: string[];
+  };
+}

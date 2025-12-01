@@ -86,7 +86,7 @@ const Calendar: React.FC = () => {
               >
                 <ChevronLeft size={20} className="text-slate-600 dark:text-slate-400" />
               </button>
-              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 dark:text-white min-w-[200px] text-center">
+              <h2 className="text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white min-w-[200px] text-center tracking-tight leading-tight">
                 {monthNames[month]} {year}
               </h2>
               <button
