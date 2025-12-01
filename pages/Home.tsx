@@ -1051,12 +1051,13 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
   }, []);
 
   return (
-    <div className="h-full w-full overflow-y-auto thin-scrollbar pb-32 sm:pb-48 md:pb-56 lg:pb-60 pt-16 sm:pt-20 md:pt-24 px-2 sm:px-4 md:px-6 safe-area-inset" style={{ paddingBottom: 'max(200px, env(safe-area-inset-bottom, 0px) + 200px)' }}>
+    <div className="h-full w-full overflow-y-auto thin-scrollbar pb-32 sm:pb-48 md:pb-56 lg:pb-60 px-2 sm:px-4 md:px-6 safe-area-inset" style={{ paddingBottom: 'max(200px, env(safe-area-inset-bottom, 0px) + 200px)' }}>
       <FilterBar 
         activeFilters={activeFilter ? [activeFilter] : []} 
         onFilterToggle={handleFilterToggle}
         darkMode={darkMode}
       />
+      <div className="pt-40 sm:pt-44 md:pt-48">
       {/* 
          Grid Layout Strategy (4 Columns):
          Row 1: Profile (2x2) - Profile first for new users
@@ -1164,6 +1165,7 @@ const Home: React.FC<HomeProps> = ({ darkMode, toggleDarkMode, onSpotifyPlay, on
             </div>
           );
         })}
+      </div>
       </div>
     </div>
   );

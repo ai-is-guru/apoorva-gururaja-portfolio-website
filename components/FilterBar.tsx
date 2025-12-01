@@ -29,7 +29,7 @@ const FilterBar: React.FC<FilterBarProps> = ({ activeFilters, onFilterToggle, da
   };
 
   return (
-    <div className="fixed top-12 left-1/2 -translate-x-1/2 sm:top-16 md:top-20 z-30 pointer-events-none pt-safe">
+    <div className="fixed top-16 left-1/2 -translate-x-1/2 sm:top-20 md:top-24 z-30 pointer-events-none pt-safe">
       <div className="bg-white/90 dark:bg-black/70 backdrop-blur-2xl px-3 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 rounded-full border border-white/30 dark:border-white/20 shadow-lg flex items-center justify-center space-x-1.5 sm:space-x-3 md:space-x-4 transition-all duration-300 pointer-events-auto max-w-[calc(100vw-1rem)] overflow-x-auto">
         {categories.map((category) => {
           const active = isActive(category);
